@@ -1,17 +1,17 @@
 .PHONY: build debug
 
 build:
-	@rm -Rf ./build/Production/Skeleton.app/
-	@mkdir -p ./build/Production/Skeleton.app/Contents/MacOS
-	@mkdir -p ./build/Production/Skeleton.app/Contents/Resources
+	@rm -Rf ./build/Production/Loda.app/
+	@mkdir -p ./build/Production/Loda.app/Contents/MacOS
+	@mkdir -p ./build/Production/Loda.app/Contents/Resources
 	# Icon files
-	# @cp ./assets/appicon.icns ./build/Production/Skeleton.app/Contents/Resources/
+	# @cp ./assets/appicon.icns ./build/Production/Loda.app/Contents/Resources/
 	# Meta Data
-	@cp ./meta/Info.plist ./build/Production/Skeleton.app/Contents/
+	@cp ./meta/Info.plist ./build/Production/Loda.app/Contents/
 	@echo "Building GUI"
 	@cd ./ui && yarn build
 	@echo "Building go-application"
-	@mewn build -o build/Production/Skeleton.app/Contents/MacOS/Skeleton
+	@mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
 	@echo "Completed."
 
 debug:
@@ -19,5 +19,5 @@ debug:
 	@echo "Building GUI"
 	@cd ./ui && yarn build
 	@echo "Building go-application"
-	@mewn build -o build/Debug/Skeleton
-	./build/Debug/Skeleton
+	@mewn build -o build/Debug/Loda
+	./build/Debug/Loda

@@ -1,6 +1,6 @@
-# skeleton-go-desktop
+# Loda
 
-Skeleton project for golang desktop application development
+Loda project for golang desktop application development
 
 ## What is included?
 

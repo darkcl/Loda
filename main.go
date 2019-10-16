@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/darkcl/skeleton-go-desktop/helpers"
-	"github.com/darkcl/skeleton-go-desktop/ipc"
+	"github.com/darkcl/loda/helpers"
+	"github.com/darkcl/loda/ipc"
 
 	webview "github.com/darkcl/webview"
 	"github.com/leaanthony/mewn"
@@ -56,7 +56,7 @@ func main() {
 	}
 
 	w := webview.New(webview.Settings{
-		Title:                  "Skeleton",
+		Title:                  "Loda",
 		URL:                    "file://" + abs,
 		Resizable:              true,
 		Width:                  1024,

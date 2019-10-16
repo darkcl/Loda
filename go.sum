@@ -1,3 +1,5 @@
+github.com/darkcl/skeleton-go-desktop v0.0.0-20190830045046-7976740ef420 h1:9eFJvlljqlf2nkZ3OEhzEbpzqHGFBx1UPy4yAkHQYQ4=
+github.com/darkcl/skeleton-go-desktop v0.0.0-20190830045046-7976740ef420/go.mod h1:Dhx45BaUoEsqknfNDeAvNFF5T2G+ornl7Jf5WNAf9vM=
 github.com/darkcl/webview v0.0.0-20190807062217-7b5ebb1dec1c h1:zoTlxhwSMWcKZaYHivV1Vc+dhrUMNUekfDcd1XQIU2M=
 github.com/darkcl/webview v0.0.0-20190807062217-7b5ebb1dec1c/go.mod h1:pXyCNfHwhn7dRDslNqaGrbAeIh+nVP3nGVc+NYN8ccA=
 github.com/google/martian v2.1.0+incompatible h1:/CP5g8u/VJHijgedC/Legn3BAbAaWPgecwXBIDzw5no=
