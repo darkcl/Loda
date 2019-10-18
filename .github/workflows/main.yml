@@ -37,6 +37,7 @@ jobs:
     strategy:
       matrix:
         os: [macOS-10.14]
+        node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v1
@@ -49,6 +50,15 @@ jobs:
       - name: List directory
         run: |
           ls ui/dist
+
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install create-dmg
+        run: |
+          npm i -g create-dmg
 
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
@@ -69,7 +79,6 @@ jobs:
           mkdir -p ./build/Production/Loda.app/Contents/Resources
           cp ./meta/Info.plist ./build/Production/Loda.app/Contents/
           build/mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
-          npm install --global create-dmg
           make -i build-dmg
 
       - name: Upload Artifacts
