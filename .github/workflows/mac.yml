@@ -1,0 +1,57 @@
+name: Build Loda (macOS)
+on: [push]
+jobs:
+  build-ui:
+    name: Build macOS Application
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-10.14]
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Building UI assets with Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install, build, and test
+        run: |
+          cd ui
+          npm install
+          npm run build --if-present
+          cd dist/
+        env:
+          CI: true
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+
+      - name: Build macOS Application
+        env:
+          GO111MODULE: on
+        run: |
+          make build-mewn
+          mkdir -p ./build/Production/Loda.app/Contents/MacOS
+          mkdir -p ./build/Production/Loda.app/Contents/Resources
+          cp ./meta/Info.plist ./build/Production/Loda.app/Contents/
+          build/mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
+          npm install --global create-dmg
+          make -i build-dmg
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: loda-mac
+          path: Loda 0.0.1.dmg
