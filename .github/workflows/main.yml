@@ -2,7 +2,7 @@ name: Build Loda
 on: [push]
 jobs:
   build-ui:
-    name: Build UI assets
+    name: Build macOS Application
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -42,16 +42,16 @@ jobs:
         env:
           GO111MODULE: on
         run: |
-          go get github.com/leaanthony/mewn/cmd/mewn
+          make build-mewn
           mkdir -p ./build/Production/Loda.app/Contents/MacOS
           mkdir -p ./build/Production/Loda.app/Contents/Resources
           cp ./meta/Info.plist ./build/Production/Loda.app/Contents/
-          mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
-          cd ./build/Production/
-          zip Loda.zip ./Loda.app/**/*
+          build/mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
+          npm install --global create-dmg
+          make -i build-dmg
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
           name: loda
-          path: build/Production/Loda.zip
+          path: Loda 0.0.1.dmg
