@@ -3,7 +3,7 @@
 	<key>CFBundleName</key><string>Loda</string>
 	<key>CFBundleExecutable</key><string>Loda</string>
 	<key>CFBundleIdentifier</key><string>com.app.Loda</string>
-	<key>CFBundleVersion</key><string>0.1.0</string>
+	<key>CFBundleVersion</key><string>0.0.1</string>
 	<key>CFBundleGetInfoString</key><string>Built by {{Author}}</string>
 	<key>CFBundleShortVersionString</key><string>0.0.1</string>
 	<key>CFBundleIconFile</key><string>appicon</string>
