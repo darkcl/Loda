@@ -1,5 +1,8 @@
 .PHONY: build debug
 
+build-mewn:
+	@go build -o build/mewn cmd/mewn/main.go
+
 build:
 	@rm -Rf ./build/Production/Loda.app/
 	@mkdir -p ./build/Production/Loda.app/Contents/MacOS
