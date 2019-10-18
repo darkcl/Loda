@@ -1,5 +1,7 @@
 # Loda
 
+![](https://github.com/darkcl/Loda/workflows/Build%20Loda/badge.svg)
+
 Loda project for golang desktop application development
 
 ## What is included?
