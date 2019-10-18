@@ -2,7 +2,8 @@ name: Release Loda
 on:
   push:
     tags:
-      - "test-*"
+      - "v*"
+
 jobs:
   build-ui:
     name: Build UI Assets
