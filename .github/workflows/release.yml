@@ -1,5 +1,8 @@
-name: Build Loda
-on: [push]
+name: Release Loda
+on:
+  push:
+    tags:
+      - "test-*"
 jobs:
   build-ui:
     name: Build UI Assets
@@ -122,3 +125,51 @@ jobs:
         with:
           name: loda-win32
           path: build\Production\Loda.exe
+
+  release:
+    name: Upload Release Asset
+    needs: [build-mac, build-win32]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: loda-mac
+          path: mac
+
+      - uses: actions/download-artifact@master
+        with:
+          name: loda-win32
+          path: win32
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Windows
+        id: upload-release-asset-win32
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./win32/Loda.exe
+          asset_name: Loda.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+      - name: Upload Release MacOS
+        id: upload-release-asset-macos
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./mac/Loda 0.0.1.dmg
+          asset_name: Loda 0.0.1.dmg
+          asset_content_type: application/octet-stream
