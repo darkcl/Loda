@@ -18,35 +18,17 @@ jobs:
       - name: npm install, build, and test
         run: |
           cd ui
-          npm ci
+          npm install
           npm run build --if-present
           cd dist/
-          zip ui-assets.zip *
         env:
           CI: true
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v1
-        with:
-          name: ui-assets
-          path: dist/ui-assets.zip
-
-  build-go:
-    name: Build Loda
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macOS-10.14]
-        node-version: [12.x]
-    steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
         id: go
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
 
       - name: Get dependencies
         run: |
@@ -56,17 +38,11 @@ jobs:
               dep ensure
           fi
 
-      - name: Download ui-assets
-        uses: actions/download-artifact@v1
-        with:
-          name: ui-assets
-
-      - name: Build
+      - name: Build macOS Application
+        env:
+          GO111MODULE: on
         run: |
-          unzip ui-assets/ui-assets.zip
-          mkdir ./ui/dist
-          mv bundle.min.js ./ui/dist/bundle.min.js
-          mv index.html ./ui/dist/index.html
+          go get github.com/leaanthony/mewn/cmd/mewn
           mkdir -p ./build/Production/Loda.app/Contents/MacOS
           mkdir -p ./build/Production/Loda.app/Contents/Resources
           cp ./meta/Info.plist ./build/Production/Loda.app/Contents/
