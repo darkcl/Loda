@@ -3,17 +3,10 @@ import * as ReactDOM from "react-dom";
 import { IPCRenderer, IMessage } from "./ipc";
 import { GoogleLink } from "./compoents/google";
 
-import "rsuite/dist/styles/rsuite-dark.css";
-
-import { MainPage } from "./pages";
+import { PaperbasePage } from "./pages";
 
 const render = () =>
-  ReactDOM.render(
-    <div className="show-container">
-      <MainPage />
-    </div>,
-    document.getElementById("root")
-  );
+  ReactDOM.render(<PaperbasePage />, document.getElementById("root"));
 
 window.renderer = new IPCRenderer();
 
