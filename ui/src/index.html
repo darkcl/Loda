@@ -7,6 +7,21 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*" />
     <title>TypeScript + React</title>
   </head>
+  <style>
+    :not(input):not(textarea),
+    :not(input):not(textarea)::after,
+    :not(input):not(textarea)::before {
+      -webkit-user-select: none;
+      user-select: none;
+      cursor: default;
+    }
+    input,
+    button,
+    textarea,
+    :focus {
+      outline: none;
+    }
+  </style>
   <body>
     <div id="root"></div>
   </body>
