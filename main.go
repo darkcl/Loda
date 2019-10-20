@@ -29,16 +29,10 @@ func handleRPC(w webview.WebView, data string) {
 	ipcMain.Trigger(message)
 }
 
-func bundleAssets() string {
+func bundleAssets(dir string) (string, string) {
 	js := mewn.String("./ui/dist/bundle.min.js")
 	indexHTML := mewn.String("./ui/dist/index.html")
 
-	dir, err := ioutil.TempDir("", "skeleton")
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
-	}
-	defer os.RemoveAll(dir)
 	tmpIndex := filepath.Join(dir, "index.html")
 	if err := ioutil.WriteFile(tmpIndex, []byte(indexHTML), 0666); err != nil {
 		log.Fatal(err)
@@ -56,18 +50,18 @@ func bundleAssets() string {
 		panic(err)
 	}
 
-	return abs
+	return abs, tmpJs
 }
 
-func createWindow(mode string, host string, port int) webview.WebView {
+func createWindow(mode string, host string, port int, dir string) webview.WebView {
 	switch mode {
 	case "release":
 		fmt.Println("Release Mode")
-		abs := bundleAssets()
+		indexPath, _ := bundleAssets(dir)
 
 		return webview.New(webview.Settings{
 			Title:                  "Loda",
-			URL:                    "file://" + abs,
+			URL:                    "file://" + indexPath,
 			Resizable:              true,
 			Width:                  1024,
 			Height:                 768,
@@ -102,7 +96,14 @@ func main() {
 	flag.IntVar(&port, "port", 8080, "[Debug] Webpack Server Port")
 	flag.Parse()
 
-	w := createWindow(mode, host, port)
+	dir, err := ioutil.TempDir("", "loda")
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	w := createWindow(mode, host, port, dir)
 	defer w.Exit()
 
 	ipcMain := ipc.SharedMain()
