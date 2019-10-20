@@ -23,4 +23,8 @@ build:
 debug:
 	@echo "Running in debug mode"
 	go run main.go -mode=debug
+
+serve:
+	@echo "Starting webpack server"
+	@cd ui && yarn serve
 	
