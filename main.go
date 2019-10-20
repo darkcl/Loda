@@ -76,10 +76,10 @@ func createWindow(mode string, host string, port int) webview.WebView {
 		})
 	case "debug":
 		fmt.Println("Debug Mode")
-		webpackUrl := fmt.Sprintf("http://%s:%v", host, port)
+		webpackURL := fmt.Sprintf("http://%s:%v", host, port)
 		return webview.New(webview.Settings{
 			Title:                  "Loda",
-			URL:                    webpackUrl,
+			URL:                    webpackURL,
 			Resizable:              true,
 			Width:                  1024,
 			Height:                 768,
