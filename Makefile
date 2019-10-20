@@ -22,8 +22,7 @@ build:
 
 debug:
 	@rm -Rf ./build/Debug
-	@echo "Building GUI"
-	@cd ./ui && yarn build
 	@echo "Building go-application"
 	@mewn build -o build/Debug/Loda
-	./build/Debug/Loda
+	./build/Debug/Loda -mode=debug
+	

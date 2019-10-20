@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -28,7 +29,7 @@ func handleRPC(w webview.WebView, data string) {
 	ipcMain.Trigger(message)
 }
 
-func main() {
+func bundleAssets() string {
 	js := mewn.String("./ui/dist/bundle.min.js")
 	indexHTML := mewn.String("./ui/dist/index.html")
 
@@ -55,15 +56,53 @@ func main() {
 		panic(err)
 	}
 
-	w := webview.New(webview.Settings{
-		Title:                  "Loda",
-		URL:                    "file://" + abs,
-		Resizable:              true,
-		Width:                  1024,
-		Height:                 768,
-		ExternalInvokeCallback: handleRPC,
-		Debug:                  true,
-	})
+	return abs
+}
+
+func createWindow(mode string, host string, port int) webview.WebView {
+	switch mode {
+	case "release":
+		fmt.Println("Release Mode")
+		abs := bundleAssets()
+
+		return webview.New(webview.Settings{
+			Title:                  "Loda",
+			URL:                    "file://" + abs,
+			Resizable:              true,
+			Width:                  1024,
+			Height:                 768,
+			ExternalInvokeCallback: handleRPC,
+			Debug:                  true,
+		})
+	case "debug":
+		fmt.Println("Debug Mode")
+		webpackUrl := fmt.Sprintf("http://%s:%v", host, port)
+		return webview.New(webview.Settings{
+			Title:                  "Loda",
+			URL:                    webpackUrl,
+			Resizable:              true,
+			Width:                  1024,
+			Height:                 768,
+			ExternalInvokeCallback: handleRPC,
+			Debug:                  true,
+		})
+	default:
+		fmt.Printf("Unsupported mode: %v \n", mode)
+		os.Exit(0)
+		return nil
+	}
+}
+
+func main() {
+	var mode string
+	var host string
+	var port int
+	flag.StringVar(&mode, "mode", "release", "Application mode")
+	flag.StringVar(&host, "host", "localhost", "[Debug] Webpack Server Host")
+	flag.IntVar(&port, "port", 8080, "[Debug] Webpack Server Port")
+	flag.Parse()
+
+	w := createWindow(mode, host, port)
 	defer w.Exit()
 
 	ipcMain := ipc.SharedMain()
