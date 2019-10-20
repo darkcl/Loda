@@ -62,6 +62,9 @@ func (m *Main) Send(event string, value interface{}) {
 func (m *Main) Trigger(message Message) {
 	fmt.Println("Receive Event")
 
+	fmt.Printf("Event: %v\n", message.Event)
+	fmt.Printf("Event Value: %v\n", message.Value)
+
 	if cb, ok := m.Callback[message.Event]; ok {
 		cb(message.Event, message.Value)
 	} else {

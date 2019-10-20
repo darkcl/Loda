@@ -113,9 +113,14 @@ func main() {
 	ipcMain.On(
 		"openlink",
 		func(event string, value interface{}) interface{} {
+			if value == nil {
+				fmt.Printf("[openlink] value not provided\n")
+				return nil
+			}
+
+			fmt.Printf("Open Link: %s", value.(string))
 			url := value.(string)
 			helpers.OpenBrowser(url)
-			ipcMain.Send("testing", map[string]string{"testing": "123"})
 			return nil
 		})
 

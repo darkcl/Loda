@@ -21,8 +21,6 @@ build:
 	@echo "Completed."
 
 debug:
-	@rm -Rf ./build/Debug
-	@echo "Building go-application"
-	@mewn build -o build/Debug/Loda
-	./build/Debug/Loda -mode=debug
+	@echo "Running in debug mode"
+	go run main.go -mode=debug
 	
