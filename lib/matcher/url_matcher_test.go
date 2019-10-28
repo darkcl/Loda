@@ -5,6 +5,37 @@ import (
 	"testing"
 )
 
+func TestURLMatcher_Identifier(t *testing.T) {
+	type fields struct {
+		Matcher Matcher
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "Identifier",
+			fields: fields{
+				Matcher: &URLMatcher{},
+			},
+			want: "url",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := URLMatcher{
+				Matcher: tt.fields.Matcher,
+			}
+			got := u.Identifier()
+			if got != tt.want {
+				t.Errorf("URLMatcher.Process() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 func TestURLMatcher_Process(t *testing.T) {
 	type fields struct {
 		Matcher Matcher

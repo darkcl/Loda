@@ -21,3 +21,8 @@ func (u URLMatcher) Process(input string) (bool, Matcher) {
 
 	return true, nil
 }
+
+// Identifier describe matcher, used in getting downloader
+func (u URLMatcher) Identifier() string {
+	return "url"
+}
