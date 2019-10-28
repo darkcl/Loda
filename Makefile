@@ -1,4 +1,4 @@
-.PHONY: build debug build-dmg build-mewn
+.PHONY: build debug build-dmg build-mewn test
 
 build-mewn:
 	@go build -o build/mewn cmd/mewn/main.go
@@ -27,4 +27,7 @@ debug:
 serve:
 	@echo "Starting webpack server"
 	@cd ui && yarn serve
+
+test:
+	go test ./...
 	
