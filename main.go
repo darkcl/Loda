@@ -11,7 +11,7 @@ import (
 	"github.com/darkcl/loda/helpers"
 	"github.com/darkcl/loda/ipc"
 
-	webview "github.com/darkcl/webview"
+	webview "github.com/darkcl/loda/lib/webview"
 	"github.com/leaanthony/mewn"
 )
 
