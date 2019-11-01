@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/darkcl/loda/helpers"
-	"github.com/darkcl/loda/ipc"
+	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/webview"
 	"github.com/leaanthony/mewn"
 )
@@ -32,6 +32,9 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 	d.BaseApplication.WillLaunch(mode, configuration)
 
 	d.ApplicationName = "Loda"
+	d.IPCMain = &ipc.Main{
+		Callback: map[string]ipc.EventCallback{},
+	}
 
 	dir, err := ioutil.TempDir("", d.ApplicationName)
 

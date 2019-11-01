@@ -4,8 +4,6 @@ import (
 	"flag"
 
 	"github.com/darkcl/loda/application"
-
-	"github.com/darkcl/loda/ipc"
 )
 
 func main() {
@@ -17,11 +15,7 @@ func main() {
 	flag.StringVar(&port, "port", "8080", "[Debug] Webpack Server Port")
 	flag.Parse()
 
-	app := &application.DesktopApplication{
-		IPCMain: &ipc.Main{
-			Callback: map[string]ipc.EventCallback{},
-		},
-	}
+	app := &application.DesktopApplication{}
 
 	defer app.WillTerminate()
 
