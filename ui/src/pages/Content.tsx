@@ -16,7 +16,16 @@ const Content: React.FunctionComponent<{}> = () => {
           setDownloadURL(evt.target.value);
         }}
       />
-      <Button onClick={() => console.log(downloadURL)}>Start</Button>
+      <Button
+        onClick={() => {
+          window.renderer.send({
+            evt: "openlink",
+            val: "http://google.com"
+          });
+        }}
+      >
+        Start
+      </Button>
     </div>
   );
 };

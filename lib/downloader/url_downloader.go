@@ -80,6 +80,7 @@ Loop:
 	}
 
 	u.IsDone = true
+	close(report)
 }
 
 // PostProcess will clean up files
