@@ -5,16 +5,17 @@ import "time"
 // Downloader interface describe a downloader
 type Downloader interface {
 	PreProcess()
-	Process(report ProgressCallback)
+	Process()
 	PostProcess()
 
-	Done() bool
+	Report() chan DownloadProgress
+	Done() chan bool
 	Error() error
 	Identifier() string
 }
 
 // ProgressCallback is the callback to report download progress
-type ProgressCallback = func(progress DownloadProgress)
+type ProgressCallback = func(progress *DownloadProgress)
 
 // DownloadProgress describe current download progress
 type DownloadProgress struct {
