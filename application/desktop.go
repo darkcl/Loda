@@ -61,8 +61,6 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 func (d *DesktopApplication) DidFinishLaunching() {
 	d.BaseApplication.DidFinishLaunching()
 
-	d.Window.Run()
-
 	d.IPCMain.On(
 		"openlink",
 		func(event string, value interface{}) interface{} {
@@ -76,6 +74,8 @@ func (d *DesktopApplication) DidFinishLaunching() {
 			helpers.OpenBrowser(url)
 			return nil
 		})
+
+	d.Window.Run()
 }
 
 // WillTerminate call before application Terminate
