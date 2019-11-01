@@ -1,9 +1,15 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, TextField } from "@material-ui/core";
 
 const Content: React.FunctionComponent<{}> = () => {
   const [downloadURL, setDownloadURL] = useState("");
+
+  useEffect(() => {
+    window.renderer.on("progress.download", (evt, val) => {
+      console.log(`[${evt}]: ${val}`);
+    });
+  });
 
   return (
     <div>
@@ -19,8 +25,11 @@ const Content: React.FunctionComponent<{}> = () => {
       <Button
         onClick={() => {
           window.renderer.send({
-            evt: "openlink",
-            val: "http://google.com"
+            evt: "request.create_download",
+            val: JSON.stringify({
+              url: "http://example.com/example.txt",
+              destination: "/tmp"
+            })
           });
         }}
       >

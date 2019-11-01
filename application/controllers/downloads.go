@@ -2,6 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/darkcl/loda/lib/downloader"
 
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/matcher"
@@ -61,7 +65,45 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 // CreateDownloadTask will create a download taks and start notify download progress
 func (d *DownloadController) CreateDownloadTask(request DownloadRequest, ipcMain *ipc.Main) {
 	// Match The URL
+	downloaderID := ""
+
+	for _, m := range d.Matchers {
+		matched, _ := m.Process(request.URL)
+		if matched == true {
+			downloaderID = m.Identifier()
+		}
+	}
+
+	if downloaderID == "" {
+		ipcMain.Send("error.create_download", map[string]string{
+			"error": "No matching downloader",
+		})
+	}
 
 	// Create Downloader
+	switch downloaderID {
+	case "url":
+		d.startURLDownloader(request, ipcMain)
+	default:
+		ipcMain.Send("error.create_download", map[string]string{
+			"error": fmt.Sprintf("No downloader of this match: %s", downloaderID),
+		})
+	}
+}
 
+func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain *ipc.Main) {
+	loader := downloader.NewURLDownloader(downloader.URLDownloaderParams{
+		URL:              request.URL,
+		Destination:      request.Destination,
+		NumOfConnections: 1,
+		IsResumable:      true,
+		ReportInterval:   500 * time.Millisecond,
+	})
+
+	defer loader.PostProcess()
+
+	loader.PreProcess()
+	loader.Process(func(progress downloader.DownloadProgress) {
+		ipcMain.Send("progress.download", progress)
+	})
 }

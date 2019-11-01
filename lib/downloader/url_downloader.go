@@ -46,7 +46,7 @@ func (u URLDownloader) PreProcess() {
 }
 
 // Process will start a download process
-func (u URLDownloader) Process(report chan DownloadProgress) {
+func (u URLDownloader) Process(report ProgressCallback) {
 	label := ksuid.New().String()
 	client := grab.NewClient()
 	req, _ := grab.NewRequest(u.Destination, u.URL)
@@ -67,7 +67,7 @@ Loop:
 				BytesPerSecond: resp.BytesPerSecond(),
 				Progress:       resp.Progress(),
 			}
-			report <- progress
+			report(progress)
 
 		case <-resp.Done:
 			break Loop
@@ -80,7 +80,6 @@ Loop:
 	}
 
 	u.IsDone = true
-	close(report)
 }
 
 // PostProcess will clean up files

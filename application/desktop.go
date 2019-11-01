@@ -62,6 +62,7 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 
 	d.Controllers = []controllers.Controller{
 		&controllers.LinkController{},
+		&controllers.DownloadController{},
 	}
 }
 
