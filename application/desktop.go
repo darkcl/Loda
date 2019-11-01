@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/darkcl/loda/application/controllers"
+
 	"github.com/darkcl/loda/helpers"
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/webview"
@@ -25,6 +27,8 @@ type DesktopApplication struct {
 
 	IPCMain *ipc.Main
 	Window  webview.WebView
+
+	Controllers []controllers.Controller
 }
 
 // WillLaunch call before application is launch
@@ -55,11 +59,22 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 		d.Window = d.createWindow(true)
 		d.IPCMain.SetView(d.Window)
 	}
+
+	d.Controllers = []controllers.Controller{
+		&controllers.LinkController{},
+	}
 }
 
 // DidFinishLaunching call after all application launch logic is completed
 func (d *DesktopApplication) DidFinishLaunching() {
 	d.BaseApplication.DidFinishLaunching()
+
+	launchContext := make(map[string]interface{})
+	launchContext["ipc"] = d.IPCMain
+
+	for _, con := range d.Controllers {
+		con.Load(launchContext)
+	}
 
 	d.IPCMain.On(
 		"openlink",
