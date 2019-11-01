@@ -1,4 +1,4 @@
-.PHONY: build debug build-dmg build-mewn
+.PHONY: build debug build-dmg build-mewn test
 
 build-mewn:
 	@go build -o build/mewn cmd/mewn/main.go
@@ -21,9 +21,13 @@ build:
 	@echo "Completed."
 
 debug:
-	@rm -Rf ./build/Debug
-	@echo "Building GUI"
-	@cd ./ui && yarn build
-	@echo "Building go-application"
-	@mewn build -o build/Debug/Loda
-	./build/Debug/Loda
+	@echo "Running in debug mode"
+	go run main.go -mode=debug
+
+serve:
+	@echo "Starting webpack server"
+	@cd ui && yarn serve
+
+test:
+	go test ./...
+	
