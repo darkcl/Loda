@@ -10,7 +10,6 @@ import (
 
 	"github.com/darkcl/loda/application/controllers"
 
-	"github.com/darkcl/loda/helpers"
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/webview"
 	"github.com/leaanthony/mewn"
@@ -76,20 +75,6 @@ func (d *DesktopApplication) DidFinishLaunching() {
 	for _, con := range d.Controllers {
 		con.Load(launchContext)
 	}
-
-	d.IPCMain.On(
-		"openlink",
-		func(event string, value interface{}) interface{} {
-			if value == nil {
-				fmt.Printf("[openlink] value not provided\n")
-				return nil
-			}
-
-			fmt.Printf("Open Link: %s", value.(string))
-			url := value.(string)
-			helpers.OpenBrowser(url)
-			return nil
-		})
 
 	d.Window.Run()
 }
