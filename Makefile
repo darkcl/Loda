@@ -21,8 +21,8 @@ build:
 	@echo "Completed."
 
 debug:
-	@echo "Running in debug mode"
-	go run main.go -mode=debug
+	@echo "Starting Loda in fresh"
+	MODE=debug fresh
 
 serve:
 	@echo "Starting webpack server"
