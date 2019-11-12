@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/darkcl/loda/application/services"
+
+	"github.com/darkcl/loda/application/repositories"
+
 	"github.com/darkcl/loda/lib/downloader"
 	"github.com/segmentio/ksuid"
 
@@ -16,8 +20,10 @@ import (
 type DownloadController struct {
 	Controller
 
-	Matchers    []matcher.Matcher
-	ProgressMap map[string]downloader.DownloadProgress
+	Matchers   []matcher.Matcher
+	Repository repositories.DownloadRepository
+
+	progressService services.DownloadProgressService
 }
 
 // DownloadRequest - Download request model
@@ -28,7 +34,7 @@ type DownloadRequest struct {
 
 // DownloadProgressRequest - Download progress request model
 type DownloadProgressRequest struct {
-	Label string `json:"label"`
+	ID int `json:"id"`
 }
 
 // Load is called when application is loaded
@@ -38,7 +44,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 		&matcher.URLMatcher{},
 	}
 
-	d.ProgressMap = make(map[string]downloader.DownloadProgress)
+	d.progressService = services.NewDownloadProgessService(d.Repository)
 
 	// Load IPC
 	ipcMain, ok := context["ipc"].(*ipc.Main)
@@ -89,15 +95,16 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 				})
 			}
 
-			p, found := d.ProgressMap[request.Label]
+			task, err := d.Repository.FindOne(request.ID)
 
-			if found == false {
+			if err != nil {
 				ipcMain.Send("error.download_progress", map[string]string{
 					"error": "Progress not found",
 				})
+				return nil
 			}
 
-			ipcMain.Send("progress.download", p)
+			ipcMain.Send("progress.download", task.Progress)
 			return nil
 		})
 }
@@ -136,6 +143,15 @@ func (d *DownloadController) CreateDownloadTask(request DownloadRequest, ipcMain
 func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain *ipc.Main, label string) {
 	interval := 1000 * time.Millisecond
 
+	task, err := d.Repository.Create(request.Destination, "url-download")
+
+	if err != nil {
+		ipcMain.Send("error.create_download", map[string]string{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	loader := downloader.NewURLDownloader(downloader.URLDownloaderParams{
 		URL:              request.URL,
 		Label:            label,
@@ -159,7 +175,7 @@ func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain 
 			return
 		case <-t.C:
 			p := <-loader.Report()
-			d.ProgressMap[label] = p
+			d.progressService.UpdateProgress(task, p)
 			fmt.Printf("Progress: %s\n", p.Label)
 		}
 	}
