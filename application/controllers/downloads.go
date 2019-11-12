@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/darkcl/loda/application/models"
 	"github.com/darkcl/loda/application/services"
+	"github.com/segmentio/ksuid"
 
 	"github.com/darkcl/loda/application/repositories"
 
 	"github.com/darkcl/loda/lib/downloader"
-	"github.com/segmentio/ksuid"
 
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/matcher"
@@ -62,6 +63,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 				ipcMain.Send("error.create_download", map[string]string{
 					"error": "Value is not a string",
 				})
+				return nil
 			}
 
 			var request DownloadRequest
@@ -70,6 +72,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 				ipcMain.Send("error.create_download", map[string]string{
 					"error": err.Error(),
 				})
+				return nil
 			}
 
 			d.CreateDownloadTask(request, ipcMain)
@@ -85,6 +88,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 				ipcMain.Send("error.download_progress", map[string]string{
 					"error": "Value is not a string",
 				})
+				return nil
 			}
 
 			var request DownloadProgressRequest
@@ -93,6 +97,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 				ipcMain.Send("error.download_progress", map[string]string{
 					"error": err.Error(),
 				})
+				return nil
 			}
 
 			task, err := d.Repository.FindOne(request.ID)
@@ -105,6 +110,11 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 			}
 
 			ipcMain.Send("progress.download", task.Progress)
+
+			if task.IsDone == true {
+				fmt.Printf("Task is done\n")
+				ipcMain.Send("progress.download.done", task)
+			}
 			return nil
 		})
 }
@@ -130,9 +140,15 @@ func (d *DownloadController) CreateDownloadTask(request DownloadRequest, ipcMain
 	// Create Downloader
 	switch downloaderID {
 	case "url":
-		label := ksuid.New().String()
-		ipcMain.Send("download_label", label)
-		go d.startURLDownloader(request, ipcMain, label)
+		task, err := d.Repository.Create(request.Destination, "url-download")
+		if err != nil {
+			ipcMain.Send("error.create_download", map[string]string{
+				"error": err.Error(),
+			})
+			return
+		}
+		ipcMain.Send("download_label", task.ID)
+		go d.startURLDownloader(request, ipcMain, task)
 	default:
 		ipcMain.Send("error.create_download", map[string]string{
 			"error": fmt.Sprintf("No downloader of this match: %s", downloaderID),
@@ -140,17 +156,9 @@ func (d *DownloadController) CreateDownloadTask(request DownloadRequest, ipcMain
 	}
 }
 
-func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain *ipc.Main, label string) {
+func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain *ipc.Main, task *models.DownloadTask) {
 	interval := 1000 * time.Millisecond
-
-	task, err := d.Repository.Create(request.Destination, "url-download")
-
-	if err != nil {
-		ipcMain.Send("error.create_download", map[string]string{
-			"error": err.Error(),
-		})
-		return
-	}
+	label := ksuid.New().String()
 
 	loader := downloader.NewURLDownloader(downloader.URLDownloaderParams{
 		URL:              request.URL,
@@ -172,6 +180,7 @@ func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain 
 	for {
 		select {
 		case <-loader.Done():
+			d.progressService.MarkDone(task)
 			return
 		case <-t.C:
 			p := <-loader.Report()

@@ -7,9 +7,9 @@ import (
 
 // DownloadRepository describe all database operation
 type DownloadRepository interface {
-	Create(destination string, taskType string) (models.DownloadTask, error)
-	Update(task models.DownloadTask) error
-	FindOne(id int) (models.DownloadTask, error)
+	Create(destination string, taskType string) (*models.DownloadTask, error)
+	Update(task *models.DownloadTask) error
+	FindOne(id int) (*models.DownloadTask, error)
 	Destroy(id int) error
 }
 
@@ -25,8 +25,8 @@ func NewDownloadRepository(db *storm.DB) DownloadRepository {
 	}
 }
 
-func (d downloadRepository) Create(destination string, taskType string) (models.DownloadTask, error) {
-	task := models.DownloadTask{
+func (d downloadRepository) Create(destination string, taskType string) (*models.DownloadTask, error) {
+	task := &models.DownloadTask{
 		Destination: destination,
 		TaskType:    taskType,
 		IsDone:      false,
@@ -36,15 +36,15 @@ func (d downloadRepository) Create(destination string, taskType string) (models.
 	return task, err
 }
 
-func (d downloadRepository) Update(task models.DownloadTask) error {
+func (d downloadRepository) Update(task *models.DownloadTask) error {
 	err := d.db.Save(task)
 	return err
 }
 
-func (d downloadRepository) FindOne(id int) (models.DownloadTask, error) {
+func (d downloadRepository) FindOne(id int) (*models.DownloadTask, error) {
 	var task models.DownloadTask
 	err := d.db.One("ID", id, &task)
-	return task, err
+	return &task, err
 }
 
 func (d downloadRepository) Destroy(id int) error {

@@ -10,7 +10,10 @@ import (
 type DownloadProgressService interface {
 
 	// UpdateProgress takes a downloader progress and transform in to database record
-	UpdateProgress(task models.DownloadTask, progress downloader.DownloadProgress) error
+	UpdateProgress(task *models.DownloadTask, progress downloader.DownloadProgress) error
+
+	// MarkDone mark a task as done
+	MarkDone(task *models.DownloadTask) error
 }
 
 type downloadProgressService struct {
@@ -24,7 +27,7 @@ func NewDownloadProgessService(repo repositories.DownloadRepository) DownloadPro
 	}
 }
 
-func (d downloadProgressService) UpdateProgress(task models.DownloadTask, progress downloader.DownloadProgress) error {
+func (d downloadProgressService) UpdateProgress(task *models.DownloadTask, progress downloader.DownloadProgress) error {
 	task.Progress = models.DownloadProgress{
 		Label:          progress.Label,
 		ETA:            progress.ETA,
@@ -34,6 +37,12 @@ func (d downloadProgressService) UpdateProgress(task models.DownloadTask, progre
 		BytesPerSecond: progress.BytesPerSecond,
 		Progress:       progress.Progress,
 	}
+	err := d.repo.Update(task)
+	return err
+}
+
+func (d downloadProgressService) MarkDone(task *models.DownloadTask) error {
+	task.IsDone = true
 	err := d.repo.Update(task)
 	return err
 }
