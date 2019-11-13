@@ -25,6 +25,7 @@ type DownloadController struct {
 	Repository repositories.DownloadRepository
 
 	progressService services.DownloadProgressService
+	ipcMain         *ipc.Main
 }
 
 // DownloadRequest - Download request model
@@ -49,6 +50,7 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 
 	// Load IPC
 	ipcMain, ok := context["ipc"].(*ipc.Main)
+	d.ipcMain = ipcMain
 
 	if ok == false {
 		panic("Require IPC Processor")
@@ -56,67 +58,71 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 
 	ipcMain.On(
 		"request.create_download",
-		func(event string, value interface{}) interface{} {
-			payload, ok := value.(string)
-
-			if ok == false {
-				ipcMain.Send("error.create_download", map[string]string{
-					"error": "Value is not a string",
-				})
-				return nil
-			}
-
-			var request DownloadRequest
-			err := json.Unmarshal([]byte(payload), &request)
-			if err != nil {
-				ipcMain.Send("error.create_download", map[string]string{
-					"error": err.Error(),
-				})
-				return nil
-			}
-
-			d.CreateDownloadTask(request, ipcMain)
-			return nil
-		})
+		d.onCreateDownload)
 
 	ipcMain.On(
 		"request.download_progress",
-		func(event string, value interface{}) interface{} {
-			payload, ok := value.(string)
+		d.onDownloadProgress)
+}
 
-			if ok == false {
-				ipcMain.Send("error.download_progress", map[string]string{
-					"error": "Value is not a string",
-				})
-				return nil
-			}
+func (d DownloadController) onDownloadProgress(event string, value interface{}) interface{} {
+	payload, ok := value.(string)
 
-			var request DownloadProgressRequest
-			err := json.Unmarshal([]byte(payload), &request)
-			if err != nil {
-				ipcMain.Send("error.download_progress", map[string]string{
-					"error": err.Error(),
-				})
-				return nil
-			}
-
-			task, err := d.Repository.FindOne(request.ID)
-
-			if err != nil {
-				ipcMain.Send("error.download_progress", map[string]string{
-					"error": "Progress not found",
-				})
-				return nil
-			}
-
-			ipcMain.Send("progress.download", task.Progress)
-
-			if task.IsDone == true {
-				fmt.Printf("Task is done\n")
-				ipcMain.Send("progress.download.done", task)
-			}
-			return nil
+	if ok == false {
+		d.ipcMain.Send("error.download_progress", map[string]string{
+			"error": "Value is not a string",
 		})
+		return nil
+	}
+
+	var request DownloadProgressRequest
+	err := json.Unmarshal([]byte(payload), &request)
+	if err != nil {
+		d.ipcMain.Send("error.download_progress", map[string]string{
+			"error": err.Error(),
+		})
+		return nil
+	}
+
+	task, err := d.Repository.FindOne(request.ID)
+
+	if err != nil {
+		d.ipcMain.Send("error.download_progress", map[string]string{
+			"error": "Progress not found",
+		})
+		return nil
+	}
+
+	d.ipcMain.Send("progress.download", task.Progress)
+
+	if task.IsDone == true {
+		fmt.Printf("Task is done\n")
+		d.ipcMain.Send("progress.download.done", task)
+	}
+	return nil
+}
+
+func (d DownloadController) onCreateDownload(event string, value interface{}) interface{} {
+	payload, ok := value.(string)
+
+	if ok == false {
+		d.ipcMain.Send("error.create_download", map[string]string{
+			"error": "Value is not a string",
+		})
+		return nil
+	}
+
+	var request DownloadRequest
+	err := json.Unmarshal([]byte(payload), &request)
+	if err != nil {
+		d.ipcMain.Send("error.create_download", map[string]string{
+			"error": err.Error(),
+		})
+		return nil
+	}
+
+	d.CreateDownloadTask(request, d.ipcMain)
+	return nil
 }
 
 // CreateDownloadTask will create a download taks and start notify download progress
