@@ -7,3 +7,16 @@
 Download Manager implements in golang
 
 [Development Guidelines](./docs/development.md)
+
+## TODOs
+
+- [ ] Download file
+  - [ ] URL
+    - [x] Plain File
+    - [ ] Video Service
+    - [ ] Social Media
+  - [ ] Torrent
+- [ ] Destination
+  - [x] File System
+  - [ ] IPFS
+- [ ] UI
