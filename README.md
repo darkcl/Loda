@@ -5,3 +5,5 @@
 ![](https://github.com/darkcl/Loda/workflows/Test/badge.svg)
 
 Download Manager implements in golang
+
+[Development Guidelines](./docs/development.md)
