@@ -8,8 +8,12 @@ import (
 // DownloadRepository describe all database operation
 type DownloadRepository interface {
 	Create(destination string, taskType string) (*models.DownloadTask, error)
+
 	Update(task *models.DownloadTask) error
+
 	FindOne(id int) (*models.DownloadTask, error)
+	All() ([]models.DownloadTask, error)
+
 	Destroy(id int) error
 }
 
@@ -45,6 +49,12 @@ func (d downloadRepository) FindOne(id int) (*models.DownloadTask, error) {
 	var task models.DownloadTask
 	err := d.db.One("ID", id, &task)
 	return &task, err
+}
+
+func (d downloadRepository) All() ([]models.DownloadTask, error) {
+	var tasks []models.DownloadTask
+	err := d.db.All(&tasks)
+	return tasks, err
 }
 
 func (d downloadRepository) Destroy(id int) error {

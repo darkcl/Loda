@@ -21,6 +21,11 @@ const Content: React.FunctionComponent<{}> = () => {
     window.renderer.on("error.create_download", (evt, val) => {
       console.log(val);
     });
+
+    window.renderer.on("response.download_list", (evt, val) => {
+      console.log(val);
+    });
+
     window.renderer.on("progress.download.done", (evt, val) => {
       console.log("progress.download.done");
       setIsDone(true);
@@ -70,6 +75,18 @@ const Content: React.FunctionComponent<{}> = () => {
         }}
       >
         Start
+      </Button>
+      <Button
+        onClick={() => {
+          window.renderer.send({
+            evt: "request.download_list",
+            val: JSON.stringify({
+              type: "url"
+            })
+          });
+        }}
+      >
+        Get List
       </Button>
     </div>
   );

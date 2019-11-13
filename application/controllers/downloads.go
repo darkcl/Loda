@@ -63,6 +63,22 @@ func (d *DownloadController) Load(context map[string]interface{}) {
 	ipcMain.On(
 		"request.download_progress",
 		d.onDownloadProgress)
+
+	ipcMain.On(
+		"request.download_list",
+		d.onDownloadList)
+}
+
+func (d DownloadController) onDownloadList(event string, value interface{}) interface{} {
+	tasks, err := d.Repository.All()
+	if err != nil {
+		d.ipcMain.Send("error.download_list", map[string]string{
+			"error": err.Error(),
+		})
+		return nil
+	}
+	d.ipcMain.Send("response.download_list", tasks)
+	return nil
 }
 
 func (d DownloadController) onDownloadProgress(event string, value interface{}) interface{} {
