@@ -15,7 +15,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 
 	"github.com/darkcl/loda/lib/ipc"
-	"github.com/darkcl/loda/lib/webview"
+	"github.com/darkcl/webview"
 	"github.com/leaanthony/mewn"
 )
 
