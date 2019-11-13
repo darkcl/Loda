@@ -1,9 +1,8 @@
 package main
 
 import (
-	"flag"
-
 	"github.com/darkcl/loda/application"
+	"github.com/namsral/flag"
 )
 
 func main() {

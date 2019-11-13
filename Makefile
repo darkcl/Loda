@@ -17,12 +17,12 @@ build:
 	@echo "Building GUI"
 	@cd ./ui && yarn build
 	@echo "Building go-application"
-	@mewn build -o build/Production/Loda.app/Contents/MacOS/Loda
+	@mewn build -ldflags "-w" -o build/Production/Loda.app/Contents/MacOS/Loda
 	@echo "Completed."
 
 debug:
-	@echo "Running in debug mode"
-	go run main.go -mode=debug
+	@echo "Starting Loda in fresh"
+	go run -ldflags "-w" main.go -mode=debug 
 
 serve:
 	@echo "Starting webpack server"

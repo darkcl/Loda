@@ -8,9 +8,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/darkcl/loda/application/controllers"
+	"github.com/darkcl/loda/application/repositories"
 
-	"github.com/darkcl/loda/helpers"
+	"github.com/asdine/storm/v3"
+	"github.com/darkcl/loda/application/controllers"
+	"github.com/mitchellh/go-homedir"
+
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/loda/lib/webview"
 	"github.com/leaanthony/mewn"
@@ -29,6 +32,8 @@ type DesktopApplication struct {
 	Window  webview.WebView
 
 	Controllers []controllers.Controller
+
+	db *storm.DB
 }
 
 // WillLaunch call before application is launch
@@ -48,6 +53,7 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 	}
 
 	d.AssetsDir = dir
+	d.db = d.createDB()
 
 	switch d.Mode {
 	case "release":
@@ -62,7 +68,9 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 
 	d.Controllers = []controllers.Controller{
 		&controllers.LinkController{},
-		&controllers.DownloadController{},
+		&controllers.DownloadController{
+			Repository: repositories.NewDownloadRepository(d.db),
+		},
 	}
 }
 
@@ -77,20 +85,6 @@ func (d *DesktopApplication) DidFinishLaunching() {
 		con.Load(launchContext)
 	}
 
-	d.IPCMain.On(
-		"openlink",
-		func(event string, value interface{}) interface{} {
-			if value == nil {
-				fmt.Printf("[openlink] value not provided\n")
-				return nil
-			}
-
-			fmt.Printf("Open Link: %s", value.(string))
-			url := value.(string)
-			helpers.OpenBrowser(url)
-			return nil
-		})
-
 	d.Window.Run()
 }
 
@@ -98,6 +92,7 @@ func (d *DesktopApplication) DidFinishLaunching() {
 func (d *DesktopApplication) WillTerminate() {
 	d.BaseApplication.WillTerminate()
 	os.RemoveAll(d.AssetsDir)
+	d.db.Close()
 }
 
 func (d *DesktopApplication) bundleAssets() string {
@@ -147,4 +142,27 @@ func (d *DesktopApplication) handleRPC(w webview.WebView, data string) {
 	}
 
 	d.IPCMain.Trigger(message)
+}
+
+func (d *DesktopApplication) createDB() *storm.DB {
+	path, err := homedir.Dir()
+
+	if err != nil {
+		panic(err)
+	}
+
+	defaultWorkspace := filepath.Join(path, ".loda")
+	if _, err := os.Stat(defaultWorkspace); os.IsNotExist(err) {
+		os.Mkdir(defaultWorkspace, os.ModePerm)
+	}
+
+	dbPath := filepath.Join(defaultWorkspace, "data.db")
+
+	db, err := storm.Open(dbPath)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return db
 }
