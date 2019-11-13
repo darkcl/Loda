@@ -15,7 +15,7 @@ const Content: React.FunctionComponent<{}> = () => {
   };
 
   useEffect(() => {
-    window.renderer.on("progress.download", (evt, val) => {
+    window.renderer.on("response.progress.download", (evt, val) => {
       setProgress(val.progress);
     });
     window.renderer.on("error.create_download", (evt, val) => {
@@ -26,8 +26,8 @@ const Content: React.FunctionComponent<{}> = () => {
       console.log(val);
     });
 
-    window.renderer.on("progress.download.done", (evt, val) => {
-      console.log("progress.download.done");
+    window.renderer.on("response.progress.download.done", (evt, val) => {
+      console.log("response.progress.download.done");
       setIsDone(true);
     });
     window.renderer.on("download_label", (evt, val) => {

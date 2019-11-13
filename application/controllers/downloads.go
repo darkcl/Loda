@@ -109,11 +109,11 @@ func (d DownloadController) onDownloadProgress(event string, value interface{}) 
 		return nil
 	}
 
-	d.ipcMain.Send("progress.download", task.Progress)
+	d.ipcMain.Send("response.progress.download", task.Progress)
 
 	if task.IsDone == true {
 		fmt.Printf("Task is done\n")
-		d.ipcMain.Send("progress.download.done", task)
+		d.ipcMain.Send("response.progress.download.done", task)
 	}
 	return nil
 }
