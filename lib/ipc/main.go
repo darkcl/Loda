@@ -6,7 +6,7 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/darkcl/loda/lib/webview"
+	"github.com/darkcl/webview"
 )
 
 // EventCallback - event reciever callback
