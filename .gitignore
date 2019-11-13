@@ -1,6 +1,7 @@
 build/
 .env
 tmp/
+__debug_bin
 
 # Created by https://www.gitignore.io/api/go
 # Edit at https://www.gitignore.io/?templates=go

@@ -1,6 +1,6 @@
 module github.com/darkcl/loda
 
-go 1.12
+go 1.13
 
 require (
 	github.com/asdine/storm/v3 v3.0.0
