@@ -7,7 +7,7 @@ build-dmg:
 	create-dmg ./build/Production/Loda.app
 
 build-ytdl:
-	git submodule init && git submodule update
+	git submodule update --init --recursive
 	cd ./embedded/youtube-dl && make youtube-dl
 
 build:
