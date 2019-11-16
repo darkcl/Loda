@@ -43,7 +43,7 @@ func TestYoutubeDLNotSupportedSite(t *testing.T) {
 		YtdlInspector: mockInspector,
 	}
 
-	result, nextMatcher := sut.Process("youtube url")
+	result, nextMatcher := sut.Process("non youtube url")
 	assert.False(t, result, "should not match youtube video")
 	assert.Nil(t, nextMatcher, "should have no next matcher")
 }
