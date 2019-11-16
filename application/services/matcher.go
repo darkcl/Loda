@@ -110,6 +110,17 @@ func (m matcherService) Match(input string, destination string) (downloader.Down
 			ReportInterval:   interval,
 		})
 		return loader, nil
+	case "youtube-dl":
+		interval := 1000 * time.Millisecond
+		pathService := NewPathService()
+
+		loader := downloader.NewYoutubeDLDownloader(downloader.YoutubeDLDownloaderParams{
+			URL:            input,
+			Destination:    destination,
+			ReportInterval: interval,
+			BinaryPath:     pathService.YoutubeDLPath(),
+		})
+		return loader, nil
 	default:
 		return nil, errors.New("Downloader not found")
 	}

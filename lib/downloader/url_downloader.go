@@ -31,7 +31,7 @@ type URLDownloaderParams struct {
 }
 
 // NewURLDownloader creates an url downloader
-func NewURLDownloader(params URLDownloaderParams) *URLDownloader {
+func NewURLDownloader(params URLDownloaderParams) Downloader {
 	return &URLDownloader{
 		URL:              params.URL,
 		Destination:      params.Destination,
