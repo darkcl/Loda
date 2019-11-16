@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/darkcl/loda/application/repositories"
 
@@ -54,6 +55,8 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 
 	d.AssetsDir = dir
 	d.db = d.createDB()
+
+	d.embeddedYTDL()
 
 	switch d.Mode {
 	case "release":
@@ -144,17 +147,22 @@ func (d *DesktopApplication) handleRPC(w webview.WebView, data string) {
 	d.IPCMain.Trigger(message)
 }
 
-func (d *DesktopApplication) createDB() *storm.DB {
+func workspaceDir() string {
 	path, err := homedir.Dir()
 
 	if err != nil {
 		panic(err)
 	}
-
 	defaultWorkspace := filepath.Join(path, ".loda")
 	if _, err := os.Stat(defaultWorkspace); os.IsNotExist(err) {
 		os.Mkdir(defaultWorkspace, os.ModePerm)
 	}
+
+	return defaultWorkspace
+}
+
+func (d *DesktopApplication) createDB() *storm.DB {
+	defaultWorkspace := workspaceDir()
 
 	dbPath := filepath.Join(defaultWorkspace, "data.db")
 
@@ -165,4 +173,22 @@ func (d *DesktopApplication) createDB() *storm.DB {
 	}
 
 	return db
+}
+
+func (d *DesktopApplication) embeddedYTDL() {
+	defaultWorkspace := workspaceDir()
+	binName := "youtube-dl"
+
+	ytdl := mewn.String("./bin/youtube-dl")
+	if runtime.GOOS == "windows" {
+		ytdl = mewn.String("./bin/youtube-dl.exe")
+		binName = "youtube-dl.exe"
+	}
+
+	ytdlPath := filepath.Join(defaultWorkspace, binName)
+
+	if err := ioutil.WriteFile(ytdlPath, []byte(ytdl), 0777); err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
 }
