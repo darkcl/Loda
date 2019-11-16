@@ -9,16 +9,24 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/darkcl/loda/lib/inspector"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInspectYoutubeURL(t *testing.T) {
+func binPath() string {
 	dir, _ := os.Getwd()
-	binPath := filepath.Join(dir, "../../embedded/youtube-dl/youtube-dl")
-	ytdl := inspector.NewYoutubeDLInspector(binPath)
+	if runtime.GOOS == "windows" {
+		return filepath.Join(dir, "../../bin/youtube-dl.exe")
+	}
+
+	return filepath.Join(dir, "../../bin/youtube-dl")
+}
+
+func TestInspectYoutubeURL(t *testing.T) {
+	ytdl := inspector.NewYoutubeDLInspector(binPath())
 	meta, err := ytdl.Process("https://www.youtube.com/watch?v=PC03Xgk__pg")
 	assert.NotNil(t, meta)
 	assert.Nil(t, err)
@@ -28,9 +36,7 @@ func TestInspectYoutubeURL(t *testing.T) {
 }
 
 func TestInspectNonYoutubeURL(t *testing.T) {
-	dir, _ := os.Getwd()
-	binPath := filepath.Join(dir, "../../embedded/youtube-dl/youtube-dl")
-	ytdl := inspector.NewYoutubeDLInspector(binPath)
+	ytdl := inspector.NewYoutubeDLInspector(binPath())
 	meta, err := ytdl.Process("https://google.com")
 	t.Logf("Error: %v\n", err)
 	assert.Nil(t, meta)

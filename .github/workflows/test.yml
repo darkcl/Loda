@@ -10,18 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-        with:
-          submodules: true
-
-      - name: Set up Python 2.x
-        uses: actions/setup-python@v1
-        with:
-          python-version: "2.x"
-          architecture: "x64"
-
-      - name: Build youtube-dl
-        run: |
-          make build-ytdl
 
       - name: Set up Go 1.13
         uses: actions/setup-go@v1

@@ -8,7 +8,6 @@ __debug_bin
 
 ### Go ###
 # Binaries for programs and plugins
-*.exe
 *.exe~
 *.dll
 *.so
