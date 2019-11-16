@@ -9,11 +9,12 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/darkcl/loda/application/services"
+
 	"github.com/darkcl/loda/application/repositories"
 
 	"github.com/asdine/storm/v3"
 	"github.com/darkcl/loda/application/controllers"
-	"github.com/mitchellh/go-homedir"
 
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/webview"
@@ -34,12 +35,14 @@ type DesktopApplication struct {
 
 	Controllers []controllers.Controller
 
-	db *storm.DB
+	db          *storm.DB
+	pathService services.PathService
 }
 
 // WillLaunch call before application is launch
 func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]string) {
 	d.BaseApplication.WillLaunch(mode, configuration)
+	d.pathService = services.NewPathService()
 
 	d.ApplicationName = "Loda"
 	d.IPCMain = &ipc.Main{
@@ -147,22 +150,8 @@ func (d *DesktopApplication) handleRPC(w webview.WebView, data string) {
 	d.IPCMain.Trigger(message)
 }
 
-func workspaceDir() string {
-	path, err := homedir.Dir()
-
-	if err != nil {
-		panic(err)
-	}
-	defaultWorkspace := filepath.Join(path, ".loda")
-	if _, err := os.Stat(defaultWorkspace); os.IsNotExist(err) {
-		os.Mkdir(defaultWorkspace, os.ModePerm)
-	}
-
-	return defaultWorkspace
-}
-
 func (d *DesktopApplication) createDB() *storm.DB {
-	defaultWorkspace := workspaceDir()
+	defaultWorkspace := d.pathService.WorkspaceDir()
 
 	dbPath := filepath.Join(defaultWorkspace, "data.db")
 
@@ -176,19 +165,16 @@ func (d *DesktopApplication) createDB() *storm.DB {
 }
 
 func (d *DesktopApplication) embeddedYTDL() {
-	defaultWorkspace := workspaceDir()
-	binName := "youtube-dl"
-
 	ytdl := mewn.String("./bin/youtube-dl")
 	if runtime.GOOS == "windows" {
 		ytdl = mewn.String("./bin/youtube-dl.exe")
-		binName = "youtube-dl.exe"
 	}
 
-	ytdlPath := filepath.Join(defaultWorkspace, binName)
-
-	if err := ioutil.WriteFile(ytdlPath, []byte(ytdl), 0777); err != nil {
-		log.Fatal(err)
-		panic(err)
+	ytdlPath := d.pathService.YoutubeDLPath()
+	if _, err := os.Stat(ytdlPath); os.IsNotExist(err) {
+		if err := ioutil.WriteFile(ytdlPath, []byte(ytdl), 0777); err != nil {
+			log.Fatal(err)
+			panic(err)
+		}
 	}
 }

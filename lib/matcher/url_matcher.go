@@ -7,19 +7,19 @@ type URLMatcher struct {
 	Matcher
 }
 
-// Process will parse a string an return next possible matcher
-func (u URLMatcher) Process(input string) (bool, Matcher) {
+// Process will parse a string
+func (u URLMatcher) Process(input string) bool {
 	result, err := url.Parse(input)
 
 	if err != nil {
-		return false, nil
+		return false
 	}
 
 	if result.Scheme != "http" && result.Scheme != "https" {
-		return false, nil
+		return false
 	}
 
-	return true, nil
+	return true
 }
 
 // Identifier describe matcher, used in getting downloader

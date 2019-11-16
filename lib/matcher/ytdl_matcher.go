@@ -15,14 +15,14 @@ func NewYoutubeDLMatcher(binaryPath string) Matcher {
 	}
 }
 
-// Process will parse a string an return next possible matcher
-func (u YoutubeDLMatcher) Process(input string) (bool, Matcher) {
+// Process will parse a string
+func (u YoutubeDLMatcher) Process(input string) bool {
 	_, err := u.YtdlInspector.Process(input)
 	if err != nil {
-		return false, nil
+		return false
 	}
 
-	return true, nil
+	return true
 }
 
 // Identifier describe matcher, used in getting downloader
