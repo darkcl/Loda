@@ -19,6 +19,17 @@ func NewYoutubeDLInspector(binaryPath string) Inspector {
 func (y YoutubeDLInspector) Process(input string) (interface{}, error) {
 	ytdl := goydl.NewYoutubeDl()
 	ytdl.YoutubeDlPath = y.binaryPath
-	_, err := ytdl.Download(input)
-	return ytdl.Info, err
+	ytdl.Options.DumpJSON.Value = true
+	cmd, err := ytdl.Download(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	return ytdl.Info, nil
 }
