@@ -12,6 +12,8 @@ type Downloader interface {
 	Done() chan bool
 	Error() error
 	Identifier() string
+
+	OnComplete()
 }
 
 // ProgressCallback is the callback to report download progress

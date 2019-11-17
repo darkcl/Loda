@@ -20,13 +20,8 @@ func (y YoutubeDLInspector) Process(input string) (interface{}, error) {
 	ytdl := goydl.NewYoutubeDl()
 	ytdl.YoutubeDlPath = y.binaryPath
 	ytdl.Options.DumpJSON.Value = true
-	cmd, err := ytdl.Download(input)
+	_, err := ytdl.Download(input)
 
-	if err != nil {
-		return nil, err
-	}
-
-	err = cmd.Wait()
 	if err != nil {
 		return nil, err
 	}

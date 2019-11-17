@@ -1,6 +1,10 @@
 package downloader
 
 import (
+	"fmt"
+	"io"
+	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -26,6 +30,15 @@ type YoutubeDLDownloaderParams struct {
 	Destination    string
 	ReportInterval time.Duration
 	BinaryPath     string
+}
+
+type outputProcessor struct {
+	io.Writer
+}
+
+func (o *outputProcessor) Write(p []byte) (n int, err error) {
+	fmt.Printf("[outputProcessor] %s\n", string(p))
+	return len(p), nil
 }
 
 // NewYoutubeDLDownloader creates a youtube-dl downloader
@@ -62,8 +75,23 @@ func (u YoutubeDLDownloader) Process() {
 		Progress: 0.0,
 	}
 	u.progressChan <- progress
-	cmd.Wait()
 
+	go io.Copy(&outputProcessor{}, ytdl.Stdout)
+	go io.Copy(os.Stderr, ytdl.Stderr)
+
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err.Error())
+	} else {
+		fmt.Println("Download complete")
+	}
+
+	u.IsDone <- true
+	u.OnComplete()
+}
+
+// OnComplete will call on download task is completed
+func (u YoutubeDLDownloader) OnComplete() {
+	fmt.Println("YoutubeDLDownloader OnComplete")
 }
 
 // PostProcess will clean up files

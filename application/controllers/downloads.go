@@ -174,12 +174,20 @@ func (d DownloadController) startDownloader(loader downloader.Downloader, ipcMai
 	for {
 		select {
 		case <-loader.Done():
+			fmt.Println("loader.Done")
 			d.progressService.MarkDone(task)
 			return
 		case <-t.C:
 			p := <-loader.Report()
 			d.progressService.UpdateProgress(task, p)
 			fmt.Printf("Progress: %s\n", p.Label)
+
+			isDone := <-loader.Done()
+			if isDone {
+				fmt.Println("loader.Done")
+				d.progressService.MarkDone(task)
+				return
+			}
 		}
 	}
 }
