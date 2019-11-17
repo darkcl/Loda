@@ -1,10 +1,13 @@
-.PHONY: build debug build-dmg build-mewn test
+.PHONY: build debug build-dmg build-mewn build-ytdl test
 
 build-mewn:
 	@go build -o build/mewn cmd/mewn/main.go
 
 build-dmg:
 	create-dmg ./build/Production/Loda.app
+
+build-ytdl:
+	cd ./embedded/youtube-dl && make youtube-dl
 
 build:
 	@rm -Rf ./build/Production/Loda.app/

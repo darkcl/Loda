@@ -67,8 +67,7 @@ const Content: React.FunctionComponent<{}> = () => {
           window.renderer.send({
             evt: "request.create_download",
             val: JSON.stringify({
-              url:
-                "https://www.vertica.com/wp-content/uploads/2019/07/Golang.png",
+              url: "https://www.youtube.com/watch?v=IoRV6UBFSRM",
               destination: "/Users/darkcl/Downloads/tmp"
             })
           });

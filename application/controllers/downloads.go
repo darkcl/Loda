@@ -7,24 +7,22 @@ import (
 
 	"github.com/darkcl/loda/application/models"
 	"github.com/darkcl/loda/application/services"
-	"github.com/segmentio/ksuid"
 
 	"github.com/darkcl/loda/application/repositories"
 
 	"github.com/darkcl/loda/lib/downloader"
 
 	"github.com/darkcl/loda/lib/ipc"
-	"github.com/darkcl/loda/lib/matcher"
 )
 
 // DownloadController implements all download related logic
 type DownloadController struct {
 	Controller
 
-	Matchers   []matcher.Matcher
 	Repository repositories.DownloadRepository
 
 	progressService services.DownloadProgressService
+	matcherService  services.MatcherService
 	ipcMain         *ipc.Main
 }
 
@@ -41,12 +39,9 @@ type DownloadProgressRequest struct {
 
 // Load is called when application is loaded
 func (d *DownloadController) Load(context map[string]interface{}) {
-	// Load Matcher
-	d.Matchers = []matcher.Matcher{
-		&matcher.URLMatcher{},
-	}
-
+	// Load Service
 	d.progressService = services.NewDownloadProgessService(d.Repository)
+	d.matcherService = services.NewMatcherService()
 
 	// Load IPC
 	ipcMain, ok := context["ipc"].(*ipc.Main)
@@ -144,70 +139,50 @@ func (d DownloadController) onCreateDownload(event string, value interface{}) in
 // CreateDownloadTask will create a download taks and start notify download progress
 func (d *DownloadController) CreateDownloadTask(request DownloadRequest, ipcMain *ipc.Main) {
 	// Match The URL
-	downloaderID := ""
+	downloader, err := d.matcherService.Match(request.URL, request.Destination)
 
-	for _, m := range d.Matchers {
-		matched, _ := m.Process(request.URL)
-		if matched == true {
-			downloaderID = m.Identifier()
-		}
-	}
-
-	if downloaderID == "" {
+	if err != nil {
 		ipcMain.Send("error.create_download", map[string]string{
-			"error": "No matching downloader",
+			"error": err.Error(),
 		})
+		return
 	}
 
-	// Create Downloader
-	switch downloaderID {
-	case "url":
-		task, err := d.Repository.Create(request.Destination, "url-download")
-		if err != nil {
-			ipcMain.Send("error.create_download", map[string]string{
-				"error": err.Error(),
-			})
-			return
-		}
-		ipcMain.Send("download_label", task.ID)
-		go d.startURLDownloader(request, ipcMain, task)
-	default:
+	task, err := d.Repository.Create(request.Destination, downloader.Identifier())
+
+	if err != nil {
 		ipcMain.Send("error.create_download", map[string]string{
-			"error": fmt.Sprintf("No downloader of this match: %s", downloaderID),
+			"error": err.Error(),
 		})
+		return
 	}
+
+	ipcMain.Send("download_label", task.ID)
+	go d.startDownloader(downloader, ipcMain, task)
 }
 
-func (d DownloadController) startURLDownloader(request DownloadRequest, ipcMain *ipc.Main, task *models.DownloadTask) {
+func (d DownloadController) startDownloader(loader downloader.Downloader, ipcMain *ipc.Main, task *models.DownloadTask) {
 	interval := 1000 * time.Millisecond
-	label := ksuid.New().String()
-
-	loader := downloader.NewURLDownloader(downloader.URLDownloaderParams{
-		URL:              request.URL,
-		Label:            label,
-		Destination:      request.Destination,
-		NumOfConnections: 1,
-		IsResumable:      true,
-		ReportInterval:   interval,
-	})
-
 	defer loader.PostProcess()
 
 	loader.PreProcess()
 	go loader.Process()
 
 	t := time.NewTicker(interval)
+
 	defer t.Stop()
 
-	for {
+	for range t.C {
 		select {
-		case <-loader.Done():
-			d.progressService.MarkDone(task)
-			return
-		case <-t.C:
-			p := <-loader.Report()
+		case done := <-loader.Done():
+			if done {
+				fmt.Println("loader.Done")
+				d.progressService.MarkDone(task)
+				return
+			}
+		case p := <-loader.Report():
 			d.progressService.UpdateProgress(task, p)
-			fmt.Printf("Progress: %s\n", p.Label)
+			fmt.Printf("Progress: %f\n", p.Progress)
 		}
 	}
 }

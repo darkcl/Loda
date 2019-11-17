@@ -2,13 +2,13 @@ build/
 .env
 tmp/
 __debug_bin
+*-mewn.go
 
 # Created by https://www.gitignore.io/api/go
 # Edit at https://www.gitignore.io/?templates=go
 
 ### Go ###
 # Binaries for programs and plugins
-*.exe
 *.exe~
 *.dll
 *.so

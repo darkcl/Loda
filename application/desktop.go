@@ -7,12 +7,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+
+	"github.com/darkcl/loda/application/services"
 
 	"github.com/darkcl/loda/application/repositories"
 
 	"github.com/asdine/storm/v3"
 	"github.com/darkcl/loda/application/controllers"
-	"github.com/mitchellh/go-homedir"
 
 	"github.com/darkcl/loda/lib/ipc"
 	"github.com/darkcl/webview"
@@ -33,12 +35,14 @@ type DesktopApplication struct {
 
 	Controllers []controllers.Controller
 
-	db *storm.DB
+	db          *storm.DB
+	pathService services.PathService
 }
 
 // WillLaunch call before application is launch
 func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]string) {
 	d.BaseApplication.WillLaunch(mode, configuration)
+	d.pathService = services.NewPathService()
 
 	d.ApplicationName = "Loda"
 	d.IPCMain = &ipc.Main{
@@ -54,6 +58,8 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 
 	d.AssetsDir = dir
 	d.db = d.createDB()
+
+	d.embeddedYTDL()
 
 	switch d.Mode {
 	case "release":
@@ -145,16 +151,7 @@ func (d *DesktopApplication) handleRPC(w webview.WebView, data string) {
 }
 
 func (d *DesktopApplication) createDB() *storm.DB {
-	path, err := homedir.Dir()
-
-	if err != nil {
-		panic(err)
-	}
-
-	defaultWorkspace := filepath.Join(path, ".loda")
-	if _, err := os.Stat(defaultWorkspace); os.IsNotExist(err) {
-		os.Mkdir(defaultWorkspace, os.ModePerm)
-	}
+	defaultWorkspace := d.pathService.WorkspaceDir()
 
 	dbPath := filepath.Join(defaultWorkspace, "data.db")
 
@@ -165,4 +162,19 @@ func (d *DesktopApplication) createDB() *storm.DB {
 	}
 
 	return db
+}
+
+func (d *DesktopApplication) embeddedYTDL() {
+	ytdl := mewn.String("./bin/youtube-dl")
+	if runtime.GOOS == "windows" {
+		ytdl = mewn.String("./bin/youtube-dl.exe")
+	}
+
+	ytdlPath := d.pathService.YoutubeDLPath()
+	if _, err := os.Stat(ytdlPath); os.IsNotExist(err) {
+		if err := ioutil.WriteFile(ytdlPath, []byte(ytdl), 0777); err != nil {
+			log.Fatal(err)
+			panic(err)
+		}
+	}
 }

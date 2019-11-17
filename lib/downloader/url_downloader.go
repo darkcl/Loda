@@ -31,7 +31,7 @@ type URLDownloaderParams struct {
 }
 
 // NewURLDownloader creates an url downloader
-func NewURLDownloader(params URLDownloaderParams) *URLDownloader {
+func NewURLDownloader(params URLDownloaderParams) Downloader {
 	return &URLDownloader{
 		URL:              params.URL,
 		Destination:      params.Destination,
@@ -75,7 +75,7 @@ func (u URLDownloader) Process() {
 			if err := resp.Err(); err != nil {
 				u.LastError = err
 			}
-
+			u.OnComplete()
 			u.IsDone <- true
 			return
 		case <-t.C:
@@ -88,6 +88,10 @@ func (u URLDownloader) Process() {
 			u.progressChan <- progress
 		}
 	}
+}
+
+// OnComplete will call on download task is completed
+func (u URLDownloader) OnComplete() {
 }
 
 // PostProcess will clean up files
