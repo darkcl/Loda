@@ -11,10 +11,10 @@ Download Manager implements in golang
 ## TODOs
 
 - [ ] Download file
-  - [ ] URL
+  - [x] URL
     - [x] Plain File
-    - [ ] Video Service
-    - [ ] Social Media
+    - [x] Video Service
+    - [x] Social Media
   - [ ] Torrent
 - [ ] Destination
   - [x] File System
