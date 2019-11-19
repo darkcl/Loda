@@ -41,7 +41,8 @@ type DownloadProgressRequest struct {
 func (d *DownloadController) Load(context map[string]interface{}) {
 	// Load Service
 	d.progressService = services.NewDownloadProgessService(d.Repository)
-	d.matcherService = services.NewMatcherService()
+	pathServce := services.NewPathService()
+	d.matcherService = services.NewMatcherService(pathServce)
 
 	// Load IPC
 	ipcMain, ok := context["ipc"].(*ipc.Main)
