@@ -80,16 +80,15 @@ func (t *matcherNode) Match(input string) string {
 	if t.Matcher.Process(input) {
 		if len(t.Next) != 0 {
 			for _, node := range t.Next {
-				return node.Match(input)
+				result := node.Match(input)
+				if result != "" {
+					return result
+				}
 			}
+			return t.Matcher.Identifier()
 		} else {
 			return t.Matcher.Identifier()
 		}
-	} else {
-		if t.Parent != nil {
-			return t.Parent.Matcher.Identifier()
-		}
-		return ""
 	}
 	return ""
 }
@@ -100,16 +99,12 @@ type matcherService struct {
 	pathService PathService
 }
 
-func (m matcherService) MatchWithTree(input string) string {
-	return m.Tree.Root.Match(input)
-}
-
 func (m matcherService) Match(input string, destination string) (downloader.Downloader, error) {
-	downloaderID := m.MatchWithTree(input)
+	downloaderID := m.Tree.Root.Match(input)
+	label := ksuid.New().String()
 	switch downloaderID {
 	case "url":
 		interval := 1000 * time.Millisecond
-		label := ksuid.New().String()
 
 		loader := downloader.NewURLDownloader(downloader.URLDownloaderParams{
 			URL:              input,
@@ -128,6 +123,26 @@ func (m matcherService) Match(input string, destination string) (downloader.Down
 			Destination:    destination,
 			ReportInterval: interval,
 			BinaryPath:     m.pathService.YoutubeDLPath(),
+		})
+		return loader, nil
+	case "torrent":
+		interval := 1000 * time.Millisecond
+
+		loader := downloader.NewTorrentDownloader(downloader.TorrentDownloaderParams{
+			TorrentFile:    input,
+			Destination:    destination,
+			ReportInterval: interval,
+			Label:          label,
+		})
+		return loader, nil
+	case "magnet":
+		interval := 1000 * time.Millisecond
+
+		loader := downloader.NewMagnetDownloader(downloader.MagnetDownloaderParams{
+			MagnetURI:      input,
+			Destination:    destination,
+			ReportInterval: interval,
+			Label:          label,
 		})
 		return loader, nil
 	default:
