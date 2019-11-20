@@ -82,9 +82,9 @@ func (u TorrentDownloader) Process() {
 	}()
 
 	for {
-		<-t.GotInfo()
 		select {
 		case <-ticker.C:
+			<-t.GotInfo()
 			if t.BytesCompleted() == t.Info().TotalLength() {
 				u.OnComplete()
 				u.IsDone <- true
@@ -93,7 +93,6 @@ func (u TorrentDownloader) Process() {
 
 			progress.BytesComplete = t.BytesCompleted()
 			progress.Progress = float64(t.BytesCompleted()) / float64(t.Info().TotalLength())
-			fmt.Printf("Tick: %f", progress.Progress)
 			u.progressChan <- progress
 		}
 	}
