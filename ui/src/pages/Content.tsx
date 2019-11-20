@@ -67,7 +67,8 @@ const Content: React.FunctionComponent<{}> = () => {
           window.renderer.send({
             evt: "request.create_download",
             val: JSON.stringify({
-              url: "https://www.youtube.com/watch?v=IoRV6UBFSRM",
+              url:
+                "/Users/darkcl/Documents/Workspace/Loda/application/services/testdata/test.torrent",
               destination: "/Users/darkcl/Downloads/tmp"
             })
           });
