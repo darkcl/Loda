@@ -86,9 +86,9 @@ func (t *matcherNode) Match(input string) string {
 				}
 			}
 			return t.Matcher.Identifier()
-		} else {
-			return t.Matcher.Identifier()
 		}
+
+		return t.Matcher.Identifier()
 	}
 	return ""
 }
