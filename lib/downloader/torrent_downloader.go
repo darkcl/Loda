@@ -77,26 +77,26 @@ func (u TorrentDownloader) Process() {
 	}
 
 	go func() {
-		for {
-			<-t.GotInfo()
-			select {
-			case <-ticker.C:
-				if t.BytesCompleted() == t.Info().TotalLength() {
-					u.OnComplete()
-					u.IsDone <- true
-					return
-				}
-				progress.BytesComplete = t.BytesCompleted()
-				progress.Progress = float64(t.BytesCompleted()) / float64(t.Info().TotalLength())
-				u.progressChan <- progress
-			}
-		}
-	}()
-
-	go func() {
 		<-t.GotInfo()
 		t.DownloadAll()
 	}()
+
+	for {
+		<-t.GotInfo()
+		select {
+		case <-ticker.C:
+			if t.BytesCompleted() == t.Info().TotalLength() {
+				u.OnComplete()
+				u.IsDone <- true
+				return
+			}
+
+			progress.BytesComplete = t.BytesCompleted()
+			progress.Progress = float64(t.BytesCompleted()) / float64(t.Info().TotalLength())
+			fmt.Printf("Tick: %f", progress.Progress)
+			u.progressChan <- progress
+		}
+	}
 }
 
 // OnComplete will call on download task is completed
