@@ -1,6 +1,6 @@
 package matcher
 
-import "regexp"
+import "strings"
 
 // MagnetMatcher will match a magnet link
 type MagnetMatcher struct {
@@ -9,9 +9,7 @@ type MagnetMatcher struct {
 
 // Process will parse a string
 func (u MagnetMatcher) Process(input string) bool {
-	magnetRegex := regexp.MustCompile(`^magnet:\?xt=urn:[a-z0-9]+:[a-z0-9]{32,40}&dn=.+&tr=.+$`)
-	result := magnetRegex.MatchString(input)
-	return result
+	return strings.HasPrefix(input, "magnet:")
 }
 
 // Identifier describe matcher, used in getting downloader
