@@ -1,6 +1,11 @@
 package downloader
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"github.com/anacrolix/torrent"
+)
 
 // MagnetDownloader downloads torrent and magnet link
 type MagnetDownloader struct {
@@ -41,6 +46,56 @@ func (u MagnetDownloader) PreProcess() {
 
 // Process will start a download process
 func (u MagnetDownloader) Process() {
+	defer func() {
+		if r := recover(); r != nil {
+			u.LastError = r.(error)
+			u.IsDone <- true
+			fmt.Printf("[MagnetDownloader] %v\n", r)
+		}
+	}()
+
+	clientConfig := torrent.NewDefaultClientConfig()
+	clientConfig.DataDir = u.Destination
+	client, err := torrent.NewClient(clientConfig)
+
+	if err != nil {
+		panic(err)
+	}
+
+	t, err := client.AddMagnet(u.MagnetURI)
+
+	if err != nil {
+		panic(err)
+	}
+
+	ticker := time.NewTicker(u.ReportInterval)
+	defer ticker.Stop()
+
+	progress := DownloadProgress{
+		Label:    u.Label,
+		Progress: 0.0,
+	}
+
+	go func() {
+		<-t.GotInfo()
+		t.DownloadAll()
+	}()
+
+	for {
+		select {
+		case <-ticker.C:
+			<-t.GotInfo()
+			if t.BytesCompleted() == t.Info().TotalLength() {
+				u.OnComplete()
+				u.IsDone <- true
+				return
+			}
+
+			progress.BytesComplete = t.BytesCompleted()
+			progress.Progress = float64(t.BytesCompleted()) / float64(t.Info().TotalLength())
+			u.progressChan <- progress
+		}
+	}
 }
 
 // OnComplete will call on download task is completed
