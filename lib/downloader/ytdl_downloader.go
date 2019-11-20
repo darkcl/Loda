@@ -120,7 +120,7 @@ func (u YoutubeDLDownloader) Error() error {
 
 // Identifier describe downloader identity
 func (u YoutubeDLDownloader) Identifier() string {
-	return "yotube-dl"
+	return "youtube-dl"
 }
 
 // ParseProgress parse youtube-dl output to progress object

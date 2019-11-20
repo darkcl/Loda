@@ -15,7 +15,9 @@ Download Manager implements in golang
     - [x] Plain File
     - [x] Video Service
     - [x] Social Media
-  - [ ] Torrent
+  - [x] Torrent
+    - [x] From File
+    - [x] From Magnet URI
 - [ ] Destination
   - [x] File System
   - [ ] IPFS
