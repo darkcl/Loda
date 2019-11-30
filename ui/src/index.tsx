@@ -1,12 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IPCRenderer, IMessage } from "./ipc";
-import { GoogleLink } from "./compoents/google";
 
-import { PaperbasePage } from "./pages";
+import { MainLayout } from "./layout";
+import { DownloadList } from "./views";
 
 const render = () =>
-  ReactDOM.render(<PaperbasePage />, document.getElementById("root"));
+  ReactDOM.render(
+    <MainLayout>
+      <DownloadList />
+    </MainLayout>,
+    document.getElementById("root")
+  );
 
 window.renderer = new IPCRenderer();
 
