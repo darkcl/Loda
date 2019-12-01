@@ -18,4 +18,5 @@ export const MainLayout: React.FunctionComponent = props => {
 const MainContainer = styled.div`
   margin-left: 160px;
   padding: 0px 10px;
+  height: 100%;
 `;

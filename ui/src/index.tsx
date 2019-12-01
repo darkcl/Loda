@@ -5,7 +5,7 @@ import { IPCRenderer, IMessage } from "./ipc";
 import { MainLayout } from "./layout";
 import { DownloadList } from "./views";
 import { Store } from "./store";
-import { Modal } from "./compoents/modal";
+import { Modal } from "./views/modal";
 
 const render = () =>
   ReactDOM.render(

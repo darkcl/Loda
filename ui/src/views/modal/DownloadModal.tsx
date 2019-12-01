@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { Dialog, Pane, Label, Tablist, Tab, Textarea } from "evergreen-ui";
-import { FolderPicker } from "../FolderPicker";
-import { FilePicker } from "../FilePicker";
+import { FolderPicker } from "../../compoents/FolderPicker";
+import { FilePicker } from "../../compoents/FilePicker";
 import { ModalStore, ModalType, ModalActions } from "../../store";
 
 type DownloadType = "url" | "file";

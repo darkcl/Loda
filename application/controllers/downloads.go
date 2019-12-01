@@ -134,6 +134,14 @@ func (d DownloadController) onCreateDownload(event string, value interface{}) in
 	}
 
 	d.CreateDownloadTask(request, d.ipcMain)
+	tasks, err := d.Repository.All()
+	if err != nil {
+		d.ipcMain.Send("error.download_list", map[string]string{
+			"error": err.Error(),
+		})
+		return nil
+	}
+	d.ipcMain.Send("response.download_list", tasks)
 	return nil
 }
 

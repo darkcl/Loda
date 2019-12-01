@@ -53,7 +53,7 @@ func (d downloadRepository) FindOne(id int) (*models.DownloadTask, error) {
 
 func (d downloadRepository) All() ([]models.DownloadTask, error) {
 	var tasks []models.DownloadTask
-	err := d.db.All(&tasks)
+	err := d.db.All(&tasks, storm.Reverse())
 	return tasks, err
 }
 
