@@ -50,11 +50,22 @@ export const DownloadModal: React.FunctionComponent = () => {
         });
       });
     } else {
+      if (filePath.length === 0) {
+        return;
+      }
+      window.renderer.send({
+        evt: "request.create_download",
+        val: JSON.stringify({
+          url: filePath,
+          destination: destination
+        })
+      });
     }
   };
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [inputURL, setInputURL] = useState("");
+  const [filePath, setFilePath] = useState("");
   const [destination, setDestination] = useState("");
 
   const [taskType, setTaskType] = useState<DownloadType>("url");
@@ -96,7 +107,7 @@ export const DownloadModal: React.FunctionComponent = () => {
           </>
         ) : (
           <FilePicker
-            onChange={files => console.log(files)}
+            onChange={filePath => setFilePath(filePath)}
             placeholder="Select file to download"
           />
         )}
