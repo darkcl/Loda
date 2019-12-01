@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { Button, Pane, Heading } from "evergreen-ui";
 import { ModalStore, ModalActions } from "../store";
-import { TasksList } from "./tasks/TasksList";
 
 export const DownloadList: React.FunctionComponent = () => {
   const modalDispatch = React.useContext(ModalStore.Dispatch);
@@ -36,7 +35,6 @@ export const DownloadList: React.FunctionComponent = () => {
           </Button>
         </Pane>
       </Pane>
-      <TasksList />
     </>
   );
 };
