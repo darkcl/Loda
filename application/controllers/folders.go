@@ -24,6 +24,10 @@ func (f *FolderController) Load(context map[string]interface{}) {
 	ipcMain.On(
 		"request.open_directory",
 		f.onOpenDirectory)
+
+	ipcMain.On(
+		"request.open_file",
+		f.onOpenFile)
 }
 
 func (f FolderController) onOpenDirectory(event string, value interface{}) interface{} {
@@ -32,6 +36,18 @@ func (f FolderController) onOpenDirectory(event string, value interface{}) inter
 	if result != "" {
 		f.ipcMain.Send("response.open_directory", map[string]string{
 			"directory": result,
+		})
+		return nil
+	}
+	return nil
+}
+
+func (f FolderController) onOpenFile(event string, value interface{}) interface{} {
+	w := f.ipcMain.CurrentView()
+	result := w.Dialog(webview.DialogTypeOpen, webview.DialogFlagFile, "Open directory", "")
+	if result != "" {
+		f.ipcMain.Send("response.open_file", map[string]string{
+			"file": result,
 		})
 		return nil
 	}

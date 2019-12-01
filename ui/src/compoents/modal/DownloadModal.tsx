@@ -1,15 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
-import {
-  Dialog,
-  Pane,
-  Label,
-  Tablist,
-  FilePicker,
-  Tab,
-  Textarea
-} from "evergreen-ui";
+import { Dialog, Pane, Label, Tablist, Tab, Textarea } from "evergreen-ui";
 import { FolderPicker } from "../FolderPicker";
+import { FilePicker } from "../FilePicker";
 import { ModalStore, ModalType, ModalActions } from "../../store";
 
 type DownloadType = "url" | "file";
@@ -34,13 +27,47 @@ export const DownloadModal: React.FunctionComponent = () => {
     });
   };
 
+  const submitForm = () => {
+    console.log(`Submit Form with ${taskType}`);
+
+    if (destination.length === 0) {
+      return;
+    }
+
+    if (taskType === "url") {
+      const urls = inputURL.split("\n");
+      if (urls.length === 0) {
+        return;
+      }
+
+      urls.forEach(url => {
+        window.renderer.send({
+          evt: "request.create_download",
+          val: JSON.stringify({
+            url: url,
+            destination: destination
+          })
+        });
+      });
+    } else {
+    }
+  };
+
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [inputURL, setInputURL] = useState("");
+  const [destination, setDestination] = useState("");
+
+  const [taskType, setTaskType] = useState<DownloadType>("url");
+
   return (
     <Dialog
       isShown={modalState.modalType === ModalType.Download}
       title="Download"
       onCloseComplete={() => close()}
+      onConfirm={close => {
+        submitForm();
+        close();
+      }}
       confirmLabel="Confirm"
     >
       <Tablist>
@@ -48,7 +75,10 @@ export const DownloadModal: React.FunctionComponent = () => {
           <Tab
             key={tab}
             isSelected={selectedIndex === index}
-            onSelect={() => setSelectedIndex(index)}
+            onSelect={() => {
+              setTaskType(index === 0 ? "url" : "file");
+              setSelectedIndex(index);
+            }}
           >
             {tab}
           </Tab>
@@ -66,14 +96,18 @@ export const DownloadModal: React.FunctionComponent = () => {
           </>
         ) : (
           <FilePicker
-            marginBottom={32}
-            accept=".png"
             onChange={files => console.log(files)}
             placeholder="Select file to download"
           />
         )}
-        <Label>Destination</Label>
-        <FolderPicker onChange={val => {}} />
+      </Pane>
+      <Pane flex="1" paddingTop={16}>
+        <Label paddingTop={8}>Destination</Label>
+        <FolderPicker
+          onChange={val => {
+            setDestination(val);
+          }}
+        />
       </Pane>
     </Dialog>
   );
