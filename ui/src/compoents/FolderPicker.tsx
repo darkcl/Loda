@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Box from "ui-box";
 import { TextInput, Button } from "evergreen-ui";
 
@@ -27,6 +27,12 @@ export const FolderPicker: React.FunctionComponent<FolderPickerProps> = props =>
   } = props;
   const [folder, setFolder] = useState("");
 
+  useEffect(() => {
+    window.renderer.on("response.open_directory", (evt, value) => {
+      setFolder(value.directory || "");
+    });
+  });
+
   let inputValue;
   if (folder === "") {
     inputValue = "";
@@ -38,7 +44,12 @@ export const FolderPicker: React.FunctionComponent<FolderPickerProps> = props =>
 
   const handleFileChange = e => {};
   const handleBlur = e => {};
-  const handleButtonClick = e => {};
+  const handleButtonClick = e => {
+    window.renderer.send({
+      evt: "request.open_directory",
+      val: ""
+    });
+  };
 
   return (
     <Box display="flex" className={`${CLASS_PREFIX}-root`} {...props}>

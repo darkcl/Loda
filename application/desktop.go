@@ -77,6 +77,7 @@ func (d *DesktopApplication) WillLaunch(mode string, configuration map[string]st
 		&controllers.DownloadController{
 			Repository: repositories.NewDownloadRepository(d.db),
 		},
+		&controllers.FolderController{},
 	}
 }
 
