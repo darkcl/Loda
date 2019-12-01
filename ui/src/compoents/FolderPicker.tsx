@@ -9,7 +9,7 @@ interface FolderPickerProps {
   disabled?: boolean;
   capture?: boolean;
   height?: number;
-  onChange?: () => void;
+  onChange?: (val: string) => void;
   placeholder?: string;
 }
 
@@ -30,6 +30,7 @@ export const FolderPicker: React.FunctionComponent<FolderPickerProps> = props =>
   useEffect(() => {
     window.renderer.on("response.open_directory", (evt, value) => {
       setFolder(value.directory || "");
+      onChange(value.directory);
     });
   });
 

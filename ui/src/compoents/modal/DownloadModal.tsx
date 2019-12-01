@@ -1,19 +1,48 @@
 import * as React from "react";
 import { useState } from "react";
-import { Pane, Label, Tablist, FilePicker, Tab, Textarea } from "evergreen-ui";
+import {
+  Dialog,
+  Pane,
+  Label,
+  Tablist,
+  FilePicker,
+  Tab,
+  Textarea
+} from "evergreen-ui";
 import { FolderPicker } from "../FolderPicker";
+import { ModalStore, ModalType, ModalActions } from "../../store";
 
 type DownloadType = "url" | "file";
 
+export interface DownloadForm {
+  type: DownloadType;
+  input: string;
+  destination: string;
+}
+
 export interface DownloadModalProps {
-  onFormChange: (type: DownloadType, contexts: string[]) => void;
+  onFormChange: (form: DownloadForm) => void;
 }
 
 export const DownloadModal: React.FunctionComponent = () => {
+  const modalState = React.useContext(ModalStore.State);
+  const modalDispatch = React.useContext(ModalStore.Dispatch);
+
+  const close = () => {
+    modalDispatch({
+      type: ModalActions.DISMISS
+    });
+  };
+
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [inputURL, setInputURL] = useState("");
   return (
-    <>
+    <Dialog
+      isShown={modalState.modalType === ModalType.Download}
+      title="Download"
+      onCloseComplete={() => close()}
+      confirmLabel="Confirm"
+    >
       <Tablist>
         {["By URL", "By File"].map((tab, index) => (
           <Tab
@@ -38,14 +67,14 @@ export const DownloadModal: React.FunctionComponent = () => {
         ) : (
           <FilePicker
             marginBottom={32}
-            accept={["torrent"]}
+            accept=".png"
             onChange={files => console.log(files)}
             placeholder="Select file to download"
           />
         )}
         <Label>Destination</Label>
-        <FolderPicker />
+        <FolderPicker onChange={val => {}} />
       </Pane>
-    </>
+    </Dialog>
   );
 };
