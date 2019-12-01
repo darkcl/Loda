@@ -4,12 +4,17 @@ import { IPCRenderer, IMessage } from "./ipc";
 
 import { MainLayout } from "./layout";
 import { DownloadList } from "./views";
+import { Store } from "./store";
+import { Modal } from "./compoents/modal";
 
 const render = () =>
   ReactDOM.render(
-    <MainLayout>
-      <DownloadList />
-    </MainLayout>,
+    <Store>
+      <MainLayout>
+        <DownloadList />
+      </MainLayout>
+      <Modal />
+    </Store>,
     document.getElementById("root")
   );
 

@@ -2,11 +2,14 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { StyledSidebar } from "../compoents";
+import { SideBarContent } from "../views";
 
 export const MainLayout: React.FunctionComponent = props => {
   return (
     <div>
-      <StyledSidebar />
+      <StyledSidebar>
+        <SideBarContent />
+      </StyledSidebar>
       <MainContainer>{props.children}</MainContainer>
     </div>
   );

@@ -11,39 +11,11 @@ interface SidebarItemProps {
   name: string;
 }
 
-const SidebarItem: React.FunctionComponent<SidebarItemProps> = ({
+const Sidebar: React.FunctionComponent<SidebarProps> = ({
   className,
-  target,
-  name
+  children
 }) => {
-  return (
-    <a className={className} href={`#${target}`}>
-      {name}
-    </a>
-  );
-};
-
-const StyledSidebarItem = styled(SidebarItem)`
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-
-  &:hover {
-    color: #f1f1f1;
-  }
-`;
-
-const Sidebar: React.FunctionComponent<SidebarProps> = ({ className }) => {
-  return (
-    <div className={className}>
-      <StyledSidebarItem target="about" name="About" />
-      <StyledSidebarItem target="about" name="About" />
-      <StyledSidebarItem target="about" name="About" />
-      <StyledSidebarItem target="about" name="About" />
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 };
 
 export const StyledSidebar = styled(Sidebar)`
@@ -53,7 +25,6 @@ export const StyledSidebar = styled(Sidebar)`
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #111;
   overflow-x: hidden;
   padding-top: 20px;
 `;
