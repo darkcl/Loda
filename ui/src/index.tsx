@@ -1,12 +1,22 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IPCRenderer, IMessage } from "./ipc";
-import { GoogleLink } from "./compoents/google";
 
-import { PaperbasePage } from "./pages";
+import { MainLayout } from "./layout";
+import { DownloadList } from "./views";
+import { Store } from "./store";
+import { Modal } from "./views/modal";
 
 const render = () =>
-  ReactDOM.render(<PaperbasePage />, document.getElementById("root"));
+  ReactDOM.render(
+    <Store>
+      <MainLayout>
+        <DownloadList />
+      </MainLayout>
+      <Modal />
+    </Store>,
+    document.getElementById("root")
+  );
 
 window.renderer = new IPCRenderer();
 

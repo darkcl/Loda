@@ -34,6 +34,11 @@ func SharedMain() *Main {
 	return instance
 }
 
+// CurrentView - Get Webview
+func (m *Main) CurrentView() webview.WebView {
+	return m.w
+}
+
 // SetView -  Set Webview to main
 func (m *Main) SetView(view webview.WebView) {
 	m.w = view
