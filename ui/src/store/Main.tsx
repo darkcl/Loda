@@ -10,4 +10,4 @@ const Store = ({ children: initial }) =>
     initial
   );
 
-export { Store };
+export { Store, ModalStore };

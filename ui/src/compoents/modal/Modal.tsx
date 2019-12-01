@@ -1,6 +1,7 @@
 import * as React from "react";
-import { Pane, Dialog } from "evergreen-ui";
+import { Pane, Dialog, Text } from "evergreen-ui";
 
+import { DownloadModal } from "./DownloadModal";
 import { ModalStore, ModalType, ModalActions } from "../../store";
 
 export const Modal: React.FunctionComponent = () => {
@@ -16,10 +17,14 @@ export const Modal: React.FunctionComponent = () => {
   const getModal = (type: ModalType) => {
     switch (type) {
       case ModalType.Settings: {
-        return <p>Settings</p>;
+        return (
+          <Pane>
+            <Text>Settings</Text>
+          </Pane>
+        );
       }
       case ModalType.Download: {
-        return <p>Download</p>;
+        return <DownloadModal />;
       }
       default: {
         return <p>Hello file picker</p>;
@@ -27,12 +32,26 @@ export const Modal: React.FunctionComponent = () => {
     }
   };
 
+  const getModalTitle = (type: ModalType) => {
+    switch (type) {
+      case ModalType.Settings: {
+        return "Settings";
+      }
+      case ModalType.Download: {
+        return "Download";
+      }
+      default: {
+        return "A Modal";
+      }
+    }
+  };
+
   return (
     <Dialog
       isShown={modalState.modalType !== ModalType.None}
-      title="Dialog title"
+      title={getModalTitle(modalState.modalType)}
       onCloseComplete={() => close()}
-      confirmLabel="Custom Label"
+      confirmLabel="Confirm"
     >
       {modalState.modalType !== ModalType.None &&
         getModal(modalState.modalType)}
