@@ -51,3 +51,11 @@ ipcMain.On(
     return nil
   })
 ```
+
+### Developing on Linux
+
+webkit2gtk-4.0 is required for building this project
+
+```sh
+sudo apt install webkit2gtk-4.0
+```
