@@ -28,6 +28,7 @@
     "webpack-dev-server": "^3.8.2"
   },
   "dependencies": {
+    "@atlaskit/progress-bar": "^0.2.6",
     "evergreen-ui": "^4.21.5",
     "react": "^16.9.0",
     "react-dom": "^16.8.6",
